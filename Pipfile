@@ -7,8 +7,8 @@ name = "pypi"
 django = "*"
 djangorestframework = "*"
 djoser = "*"
+python-decouple = "*"
 django-filter = "*"
-python-decouple = "*" # For environment variables
 
 [dev-packages]
 flake8 = "*"
