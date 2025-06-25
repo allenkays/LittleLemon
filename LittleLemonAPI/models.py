@@ -34,7 +34,6 @@ class Cart(models.Model):
         return f"{self.quantity} x {self.menuitem.title} for {self.user.username}"
 
     def save(self, *args, **kwargs):
-        # Ensure price is consistent with unit_price * quantity
         self.unit_price = self.menuitem.price
         self.price = self.unit_price * self.quantity
         super().save(*args, **kwargs)
@@ -42,7 +41,7 @@ class Cart(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['user', 'menuitem'], name='unique_cart_item'),
-            models.CheckConstraint(check=models.Q(quantity__gte=1), name='quantity_gte_1'),
+            models.CheckConstraint(check=models.Q(quantity__gte=1), name='cart_quantity_gte_1'),  # Unique name
         ]
 
 
@@ -74,7 +73,6 @@ class OrderItem(models.Model):
         return f"{self.quantity} x {self.menuitem.title} in Order {self.order.id}"
 
     def save(self, *args, **kwargs):
-        # Ensure price is consistent with unit_price * quantity
         self.unit_price = self.menuitem.price
         self.price = self.unit_price * self.quantity
         super().save(*args, **kwargs)
@@ -82,5 +80,5 @@ class OrderItem(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['order', 'menuitem'], name='unique_order_item'),
-            models.CheckConstraint(check=models.Q(quantity__gte=1), name='quantity_gte_1'),
+            models.CheckConstraint(check=models.Q(quantity__gte=1), name='orderitem_quantity_gte_1'),  # Unique name
         ]

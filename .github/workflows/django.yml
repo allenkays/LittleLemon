@@ -42,6 +42,6 @@ jobs:
       - name: Run Tests
         run: |
           pipenv run python manage.py test LittleLemonAPI # Run tests for the LittleLemonAPI app
-        env:
-          DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }} # Set secret key for Django
-          DATABASE_URL: sqlite:///:memory: # Use in-memory SQLite for tests
+        # env:
+          # DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }} # Set secret key for Django
+          # DATABASE_URL: sqlite:///:memory: # Use in-memory SQLite for tests
