@@ -6,8 +6,14 @@ name = "pypi"
 [packages]
 django = "*"
 djangorestframework = "*"
+djoser = "*"
+django-filter = "*"
+python-decouple = "*" # For environment variables
 
 [dev-packages]
+flake8 = "*"
+pytest = "*"
+pytest-django = "*"
 
 [requires]
 python_version = "3.11"
