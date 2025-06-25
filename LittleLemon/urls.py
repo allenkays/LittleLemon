@@ -20,4 +20,7 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/',include('LittleLemonAPI.urls'))
+    path('api/users/', include('djoser.urls')),
+    path('api/users/users/me/', include('djoser.urls')),
+    path('token/login/', include('djoser.urls.jwt')),
 ]
