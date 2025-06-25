@@ -79,12 +79,12 @@ WSGI_APPLICATION = 'LittleLemon.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 
-SECRET_KEY = config('DJANGO_SECRET_KEY', default='django-insecure-fallback-key')
+# SECRET_KEY = config('DJANGO_SECRET_KEY', default='django-insecure-fallback-key')
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': BASE_DIR / 'db.sqlite3',
-        'NAME': ':memory:',
+        'NAME': BASE_DIR / 'db.sqlite3',
+        # 'NAME': ':memory:',
     }
 }
 
