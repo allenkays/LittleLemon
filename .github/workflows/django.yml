@@ -39,8 +39,8 @@ jobs:
 
       - name: Run Linting
         run: |
-          pipenv run flake8 .
-        continue-on-error: true
+          pipenv run flake8 LittleLemonAPI/
+          # continue-on-error: true
 
       - name: Run Migrations
         run: |

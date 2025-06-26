@@ -1,16 +1,15 @@
-from django.shortcuts import render
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, generics, status, views, permissions
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework import generics, status, views
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.filters import OrderingFilter
-from .models import Category, MenuItem, Cart, Order, OrderItem
+from .models import MenuItem, Cart, Order, OrderItem
 from .permissions import IsManager, IsDeliveryCrew, IsCustomer
 from .serializers import (
-    CategorySerializer, MenuItemSerializer, CartSerializer,
-    OrderSerializer, OrderItemSerializer, UserSerializer
+    MenuItemSerializer, CartSerializer,
+    OrderSerializer, UserSerializer
 )
 
 
@@ -37,7 +36,10 @@ class MenuItemsListCreateView(generics.ListCreateAPIView):
     def create(self, request, *args, **kwargs):
         # Ensure only Managers can create
         if not IsManager().has_permission(request, self):
-            return Response({"detail": "Unauthorized"}, status=status.HTTP_403_FORBIDDEN)
+            return Response(
+                {"detail": "Unauthorized"},
+                status=status.HTTP_403_FORBIDDEN
+            )
         return super().create(request, *args, **kwargs)
 
 
@@ -52,12 +54,18 @@ class MenuItemDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def update(self, request, *args, **kwargs):
         if not IsManager().has_permission(request, self):
-            return Response({"detail": "Unauthorized"}, status=status.HTTP_403_FORBIDDEN)
+            return Response(
+                {"detail": "Unauthorized"},
+                status=status.HTTP_403_FORBIDDEN
+            )
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not IsManager().has_permission(request, self):
-            return Response({"detail": "Unauthorized"}, status=status.HTTP_403_FORBIDDEN)
+            return Response(
+                {"detail": "Unauthorized"},
+                status=status.HTTP_403_FORBIDDEN
+            )
         return super().destroy(request, *args, **kwargs)
 
 
@@ -87,7 +95,10 @@ class ManagerGroupRemoveView(generics.DestroyAPIView):
         if user.groups.filter(name='Manager').exists():
             manager_group.user_set.remove(user)
             return Response(status=status.HTTP_200)
-        return Response({"detail": "User not found in Manager group"}, status=status.HTTP_404_NOT_FOUND)
+        return Response(
+            {"detail": "User not found in Manager group"},
+            status=status.HTTP_404_NOT_FOUND
+        )
 
 
 class DeliveryCrewGroupView(generics.ListCreateAPIView):
@@ -115,7 +126,10 @@ class DeliveryCrewGroupRemoveView(generics.DestroyAPIView):
         if user.groups.filter(name='Delivery crew').exists():
             delivery_group.user_set.remove(user)
             return Response(status=status.HTTP_200_OK)
-        return Response({"detail": "User not found in Delivery crew group"}, status=status.HTTP_404_NOT_FOUND)
+        return Response(
+            {"detail": "User not found in Delivery crew group"},
+            status=status.HTTP_404_NOT_FOUND
+        )
 
 
 # Cart Management Views
@@ -143,7 +157,10 @@ class OrdersListCreateView(generics.ListCreateAPIView):
     ordering = ['date']
 
     def get_permissions(self):
-        if self.request.method == 'GET' and IsManager().has_permission(self.request, self):
+        if (
+            self.request.method == 'GET'
+            and IsManager().has_permission(self.request, self)
+        ):
             return [IsManager()]
         return [IsCustomer()]
 
@@ -157,12 +174,18 @@ class OrdersListCreateView(generics.ListCreateAPIView):
     def create(self, request, *args, **kwargs):
         # Only Customers can create orders
         if not IsCustomer().has_permission(request, self):
-            return Response({"detail": "Unauthorized"}, status=status.HTTP_403_FORBIDDEN)
+            return Response(
+                {"detail": "Unauthorized"},
+                status=status.HTTP_403_FORBIDDEN
+            )
 
         # Get cart items for the user
         cart_items = Cart.objects.filter(user=request.user)
         if not cart_items.exists():
-            return Response({"detail": "Cart is empty"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "Cart is empty"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         # Calculate total and create order
         total = sum(item.price for item in cart_items)
@@ -199,7 +222,10 @@ class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_object(self):
         order = super().get_object()
-        if IsCustomer().has_permission(self.request, self) and order.user != self.request.user:
+        if (
+            IsCustomer().has_permission(self.request, self)
+            and order.user != self.request.user
+        ):
             self.permission_denied(self.request, message="Not your order")
         return order
 
@@ -208,20 +234,37 @@ class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
         if IsDeliveryCrew().has_permission(request, self):
             # Delivery crew can only update status
             if 'status' not in request.data or len(request.data) > 1:
-                return Response({"detail": "Delivery crew can only update status"}, status=status.HTTP_400_BAD_REQUEST)
-            serializer = self.get_serializer(order, data=request.data, partial=True)
+                return Response(
+                    {"detail": "Delivery crew can only update status"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            serializer = self.get_serializer(
+                order,
+                data=request.data,
+                partial=True
+            )
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
         elif IsManager().has_permission(request, self):
             # Managers can update delivery_crew and status
-            serializer = self.get_serializer(order, data=request.data, partial=True)
+            serializer = self.get_serializer(
+                order,
+                data=request.data,
+                partial=True
+            )
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
-        return Response({"detail": "Unauthorized"}, status=status.HTTP_403_FORBIDDEN)
+        return Response(
+            {"detail": "Unauthorized"},
+            status=status.HTTP_403_FORBIDDEN
+        )
 
     def destroy(self, request, *args, **kwargs):
         if not IsManager().has_permission(request, self):
-            return Response({"detail": "Unauthorized"}, status=status.HTTP_403_FORBIDDEN)
+            return Response(
+                {"detail": "Unauthorized"},
+                status=status.HTTP_403_FORBIDDEN
+            )
         return super().destroy(request, *args, **kwargs)
