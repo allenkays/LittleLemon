@@ -9,6 +9,7 @@ djangorestframework = "*"
 djoser = "*"
 python-decouple = "*"
 django-filter = "*"
+yamllint = "*"
 
 [dev-packages]
 flake8 = "*"
