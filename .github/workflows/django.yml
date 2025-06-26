@@ -1,3 +1,4 @@
+---
 name: Django CI
 
 on:
@@ -47,18 +48,20 @@ jobs:
           pipenv run python manage.py migrate
         env:
           DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-          DATABASE_URL: sqlite:///:memory:
+          DATABASE_URL: "sqlite:///:memory:"
 
       - name: Collect Static Files
         run: |
+          mkdir -p static
+          touch static/favicon.ico
           pipenv run python manage.py collectstatic --noinput
         env:
           DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-          DATABASE_URL: sqlite:///:memory:
+          DATABASE_URL: "sqlite:///:memory:"
 
       - name: Run Tests
         run: |
           pipenv run python manage.py test LittleLemonAPI
         env:
           DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-          DATABASE_URL: sqlite:///:memory:
+          DATABASE_URL: "sqlite:///:memory:"
