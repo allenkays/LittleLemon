@@ -12,9 +12,9 @@ django-filter = "*"
 yamllint = "*"
 
 [dev-packages]
-flake8 = "*"
 pytest = "*"
 pytest-django = "*"
+flake8 = "*"
 
 [requires]
 python_version = "3.11"
