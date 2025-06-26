@@ -10,9 +10,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 4
+      max-parallel: 1
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.11"]
 
     steps:
       - uses: actions/checkout@v4
@@ -25,14 +25,14 @@ jobs:
 
       - name: Install pipenv
         run: |
-          python -V  # Debug: Verify Python version
+          python -V
           python -m pip install --upgrade pip
           pip install pipenv
 
       - name: Install Dependencies
         run: |
           pipenv --python ${{ matrix.python-version }} install --dev
-          pipenv run pip list  # Debug: List installed packages
+          pipenv run pip list
         env:
           PIPENV_VENV_IN_PROJECT: true
 
@@ -45,13 +45,20 @@ jobs:
         run: |
           pipenv run python manage.py makemigrations --check
           pipenv run python manage.py migrate
-        # env:
-        #   DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-        #   DATABASE_URL: sqlite:///:memory:
+        env:
+          DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          DATABASE_URL: sqlite:///:memory:
+
+      - name: Collect Static Files
+        run: |
+          pipenv run python manage.py collectstatic --noinput
+        env:
+          DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          DATABASE_URL: sqlite:///:memory:
 
       - name: Run Tests
         run: |
           pipenv run python manage.py test LittleLemonAPI
-        # env:
-        #   DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-        #   DATABASE_URL: sqlite:///:memory:
+        env:
+          DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          DATABASE_URL: sqlite:///:memory:

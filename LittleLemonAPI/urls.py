@@ -4,6 +4,7 @@ from . import views
 app_name = 'LittleLemonAPI'
 
 urlpatterns = [
+    path('', views.HomeView.as_view(), name='home'),
     # Menu Items
     path('menu-items/', views.MenuItemsListCreateView.as_view(), name='menu-items-list'),
     path('menu-items/<int:pk>/', views.MenuItemDetailView.as_view(), name='menu-item-detail'),

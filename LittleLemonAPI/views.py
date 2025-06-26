@@ -1,20 +1,23 @@
 from django.shortcuts import render
-
-# Create your views here.
-    
-from rest_framework import generics, status
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.response import Response
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, generics, status, views, permissions
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.response import Response
 from rest_framework.filters import OrderingFilter
 from .models import Category, MenuItem, Cart, Order, OrderItem
+from .permissions import IsManager, IsDeliveryCrew, IsCustomer
 from .serializers import (
     CategorySerializer, MenuItemSerializer, CartSerializer,
     OrderSerializer, OrderItemSerializer, UserSerializer
 )
-from .permissions import IsManager, IsDeliveryCrew, IsCustomer
+
+
+# Create your views here.
+class HomeView(views.APIView):
+    def get(self, request):
+        return Response({"message": "Welcome to the Little Lemon API"})
 
 
 # Menu Items Views
